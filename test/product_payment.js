@@ -26,7 +26,7 @@ contract('ProductPayment, regular operations,', function(accounts) {
 
   var owner = accounts[0];
   var contributor = accounts[1];
-  var beneficiary = "0x0000000000000000000000000000000000000001";
+  var beneficiary = accounts[2];
   var productPayment;
 
   it("should deploy a new productPayment, with owner as beneficiary", function (done) {
@@ -40,6 +40,33 @@ contract('ProductPayment, regular operations,', function(accounts) {
       })
       .then(done)
       .catch(done);
+
+  });
+
+  it("should have the proper initial values", function (done) {
+
+    productPayment.owner()
+        .then(function (ownerAddress0) {
+            assert.equal(ownerAddress0, owner, "should be proper owner");
+            return productPayment.price();
+        })
+        .then(function (price1) {
+            assert.equal(price1.toString(10), web3.toWei(100, "finney"), "price should be same");
+            return productPayment.beneficiary();
+        })
+        .then(function (beneficiaryAddress2) {
+            assert.equal(beneficiaryAddress2, owner, "beneficiary not as built");
+            return productPayment.isPaid();
+        })
+        .then(function (isPaid3) {
+            assert.isFalse(isPaid3, "should not start as paid");
+            return productPayment.getContributorsCount();
+        })
+        .then(function (count4) {
+            assert.equal(count4, 0, "should not have any contributor");
+        })
+        .then(done)
+        .catch(done);
 
   });
 
@@ -212,7 +239,7 @@ contract('ProductPayment, regular operations,', function(accounts) {
 
     ProductPayment.new(
         web3.toWei(100, "finney"),
-        owner,
+        beneficiary,
         { from: owner })
       .then(function (newProductPayment) {
         productPayment = newProductPayment;
@@ -224,11 +251,8 @@ contract('ProductPayment, regular operations,', function(accounts) {
 
   it("should be possible to pass more than the price in 1 go", function (done) {
 
-    assert.equal(
-        web3.eth.getBalance(beneficiary).valueOf(),
-        0,
-        "beneficiary should start at 0");
-
+    var beneficiaryInitialBalance = web3.eth.getBalance(beneficiary);
+    
     txn0 = web3.eth.sendTransaction({
             from: contributor, 
             to: productPayment.address,
@@ -239,14 +263,15 @@ contract('ProductPayment, regular operations,', function(accounts) {
     web3.eth.getTransactionReceiptMined(txn0)
         .then(function (receipt1) {
             assert.isAtMost(receipt1.gasUsed, 200000, "not all gas should have been used");
-            console.log(web3.eth.getBalance(beneficiary).toString());
-            // assert.equal(
-            //     web3.eth.getBalance(beneficiary).valueOf(),
-            //     web3.toWei(100, "finney"),
-            //     "beneficiary should have received");
+            var beneficiaryReceived = web3.eth.getBalance(beneficiary)
+                .minus(beneficiaryInitialBalance);
             assert.equal(
-                web3.eth.getBalance(productPayment.address),
-                0,
+                beneficiaryReceived.valueOf(),
+                web3.toWei(100, "finney"),
+                "beneficiary should have received");
+            assert.equal(
+                web3.eth.getBalance(productPayment.address).toString(10),
+                "0",
                 "contract should be empty");
             return productPayment.isPaid();
         })
