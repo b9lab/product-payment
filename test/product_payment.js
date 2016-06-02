@@ -20,8 +20,6 @@ web3.eth.getTransactionReceiptMined = function (txnHash) {
     });
 };
 
-var generator = require("ether-pudding/generator");
-
 contract('ProductPayment, regular operations,', function(accounts) {
 
   var owner = accounts[0];
