@@ -14,7 +14,7 @@ contract ProductPayment is Owned {
 
 	event OnRemaining(uint indexed leftToPay);
 
-	function ProductPayment(uint _price, address _beneficiary) {
+	function ProductPayment(uint _price, address _beneficiary) noValue {
 		price = _price;
 		beneficiary = _beneficiary;
 	}
@@ -26,25 +26,35 @@ contract ProductPayment is Owned {
 		_
 	}
 
-	function getContributorsCount() constant
+	modifier noValue {
+		if (msg.value > 0) {
+			throw;
+		}
+		_
+	}
+
+	function getContributorsCount()
+		noValue
 		returns (uint count) {
 		count = contributors.length;		
 	}
 
 	function setBeneficiary(address _beneficiary)
-		isNotPaidYet 
+		isNotPaidYet noValue
 		returns (bool success) {
 		beneficiary = _beneficiary;
 		success = true;
 	}
 
-	function refundMe() isNotPaidYet {
+	function refundMe()
+		isNotPaidYet noValue {
 		if (msg.sender.send(contributions[msg.sender])) {
 			contributions[msg.sender] = 0;
 		}
 	}
 
-	function () isNotPaidYet {
+	function ()
+		isNotPaidYet {
 		if (msg.value == 0) {
 			throw;
 		}
