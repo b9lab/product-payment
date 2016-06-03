@@ -1,5 +1,8 @@
 import "Multiowned.sol";
 
+/**
+ * This is an abstract class because the constructor of Multiowned is not called.
+ */
 contract PaymentDb is Multiowned {
 	struct PaymentAdder {
 		address who;

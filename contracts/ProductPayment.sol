@@ -40,7 +40,7 @@ contract ProductPayment is Owned {
 	}
 
 	function setBeneficiary(address _beneficiary)
-		isNotPaidYet noValue
+		fromOwner isNotPaidYet noValue
 		returns (bool success) {
 		beneficiary = _beneficiary;
 		success = true;

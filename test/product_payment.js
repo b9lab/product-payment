@@ -181,6 +181,38 @@ contract('ProductPayment, regular operations,', function(accounts) {
 
   });
 
+  it("should not be possible to call setBeneficiary other than from owner", function (done) {
+
+    new Promise(function (resolve, reject) {
+            try {
+                resolve(productPayment.setBeneficiary(
+                    beneficiary,
+                    { 
+                        from: beneficiary, 
+                        gas: 300000
+                    }));
+            } catch(e) {
+                reject(e);
+            }
+        })
+        .then(function (txn0) {
+            return web3.eth.getTransactionReceiptMined(txn0);
+        })
+        .then(function (receipt1) {
+            assert.equal(receipt1.gasUsed, 300000, "should have used all the gas");
+        })
+        .then(done)
+        .catch(function (e) {
+            if ((e + "").indexOf("invalid JUMP") > -1) {
+                // We are in TestRPC
+                done();
+            } else {
+                done(e);
+            }
+        });
+
+  });
+
   it("should not be possible to send value of zero", function (done) {
 
     new Promise(function (resolve, reject) {
