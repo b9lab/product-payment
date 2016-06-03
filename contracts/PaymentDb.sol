@@ -53,7 +53,7 @@ contract PaymentDb is Multiowned {
 	function isPaymentAdder(address who)
 		noValue
 		returns (bool) {
-		return paymentAdders[who].who != 0x0;
+		return paymentAdders[who].isThere;
 	}
 
 	function getPaymentAdderCount()

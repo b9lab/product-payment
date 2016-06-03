@@ -27,7 +27,11 @@ contract('ProductPayment, regular operations,', function(accounts) {
 
   var owner = accounts[0];
   var otherAdder = accounts[1];
-  var beneficiary = accounts[2];
+  var anotherAdder = accounts[2];
+  var idHash1 = "0x0011223344556677889900112233445566778899001122334455667788990011";
+  var productPayment1 = "0x0123456789012345678901234567890123456789";
+  var idHash2 = "0x00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff";
+  var productPayment2 = "0x0123456789abcdef0123456789abcdef01234567";
   var paymentDb;
 
   it("should not deploy a contract with value", function (done) {
@@ -267,7 +271,7 @@ contract('ProductPayment, regular operations,', function(accounts) {
     new Promise(function (resolve, reject) {
             try {
                 resolve(paymentDb.addProductPayment(
-                        "0x001122334455667788990011223344556677889900112233445566778899001122",
+                        idHash1,
                         otherAdder,
                         { 
                             from: owner, 
@@ -303,18 +307,205 @@ contract('ProductPayment, regular operations,', function(accounts) {
                 assert.isTrue(success0, "should be possible to remove");
                 return paymentDb.removePaymentAdder(owner, { from: owner, gas: 300000 });        
             })
-            .then(function (txn0) {
-                return web3.eth.getTransactionReceiptMined(txn0);
+            .then(function (txn1) {
+                return web3.eth.getTransactionReceiptMined(txn1);
             })
-            .then(function (receipt1) {
+            .then(function (receipt2) {
                 return paymentDb.getPaymentAdderCount.call();
             })
-            .then(function (count2) {
-                assert.equal(count2.valueOf(), 0, "should not have any paymentAdder left");
+            .then(function (count3) {
+                assert.equal(count3.valueOf(), 0, "should not have any paymentAdder left");
                 return paymentDb.paymentAdders(owner);
             })
-            .then(function (paymentAdder3) {
-                assert.isFalse(paymentAdder3[2], "flag should have been lowered");
+            .then(function (paymentAdder4) {
+                assert.isFalse(paymentAdder4[2], "flag should have been lowered");
+            })
+            .then(done)
+            .catch(done);
+
+    });
+
+    it("should be possible to add a paymentAdder", function (done) {
+
+        paymentDb.addPaymentAdder.call(otherAdder, { from: owner })
+            .then(function (success0) {
+                assert.isTrue(success0, "should be possible to remove");
+                return paymentDb.addPaymentAdder(otherAdder, { from: owner, gas: 300000 });        
+            })
+            .then(function (txn1) {
+                return web3.eth.getTransactionReceiptMined(txn1);
+            })
+            .then(function (receipt2) {
+                return paymentDb.getPaymentAdderCount.call();
+            })
+            .then(function (count3) {
+                assert.equal(count3.valueOf(), 1, "should have 1 paymentAdder");
+                return paymentDb.paymentAdderList(0);
+            })
+            .then(function (paymentAdderAddress4) {
+                assert.equal(paymentAdderAddress4, otherAdder, "should be in first position");
+                return paymentDb.paymentAdders(otherAdder);
+            })
+            .then(function (paymentAdder5) {
+                assert.equal(paymentAdder5[0], otherAdder, "otherAdder should have been added");
+                assert.equal(paymentAdder5[1], 0, "should come as first");
+                assert.isTrue(paymentAdder5[2], "flag should have been raised");
+            })
+            .then(done)
+            .catch(done);
+
+    });
+
+    it("should be possible to add another paymentAdder", function (done) {
+
+        paymentDb.addPaymentAdder.call(anotherAdder, { from: owner })
+            .then(function (success0) {
+                assert.isTrue(success0, "should be possible to remove");
+                return paymentDb.addPaymentAdder(anotherAdder, { from: owner, gas: 300000 });        
+            })
+            .then(function (txn1) {
+                return web3.eth.getTransactionReceiptMined(txn1);
+            })
+            .then(function (receipt2) {
+                return paymentDb.getPaymentAdderCount.call();
+            })
+            .then(function (count3) {
+                assert.equal(count3.valueOf(), 2, "should have the second paymentAdder");
+                return paymentDb.paymentAdderList(1);
+            })
+            .then(function (paymentAdderAddress4) {
+                assert.equal(paymentAdderAddress4, anotherAdder, "should be in second position");
+                return paymentDb.paymentAdders(anotherAdder);
+            })
+            .then(function (paymentAdder5) {
+                assert.equal(paymentAdder5[0], anotherAdder, "anotherAdder should have been added");
+                assert.equal(paymentAdder5[1], 1, "should come as second");
+                assert.isTrue(paymentAdder5[2], "flag should have been raised");
+            })
+            .then(done)
+            .catch(done);
+
+    });
+
+    it("should be possible to remove the first paymentAdder", function (done) {
+
+        paymentDb.removePaymentAdder.call(otherAdder, { from: owner })
+            .then(function (success0) {
+                assert.isTrue(success0, "should be possible to remove the first");
+                return paymentDb.removePaymentAdder(otherAdder, { from: owner, gas: 300000 });        
+            })
+            .then(function (txn1) {
+                return web3.eth.getTransactionReceiptMined(txn1);
+            })
+            .then(function (receipt2) {
+                return paymentDb.getPaymentAdderCount.call();
+            })
+            .then(function (count3) {
+                assert.equal(count3.valueOf(), 1, "should have anotherAdder left");
+                return paymentDb.paymentAdders(otherAdder);
+            })
+            .then(function (paymentAdder4) {
+                assert.isFalse(paymentAdder4[2], "flag should have been lowered");
+                return paymentDb.paymentAdders(anotherAdder);
+            })
+            .then(function (paymentAdder5) {
+                assert.equal(paymentAdder5[0], anotherAdder, "anotherAdder should be here");
+                assert.equal(paymentAdder5[1], 0, "anotherAdder should be said in first position");
+                assert.isTrue(paymentAdder5[2], "anotherAdder should be flagged isThere");
+                return paymentDb.paymentAdderList(0);
+            })
+            .then(function (paymentAdderAddress6) {
+                assert.equal(paymentAdderAddress6, anotherAdder, "anotherAdder should be in first position");
+            })
+            .then(done)
+            .catch(done);
+
+    });
+
+    it("should be possible to add a productPayment", function (done) {
+
+        paymentDb.addProductPayment.call(idHash1, productPayment1, { from: anotherAdder })
+            .then(function (success0) {
+                assert.isTrue(success0, "adding idHash1 should be possible");
+                return paymentDb.addProductPayment(idHash1, productPayment1, { from: anotherAdder });
+            })
+            .then(function (txn1) {
+                return web3.eth.getTransactionReceiptMined(txn1);
+            })
+            .then(function (receipt2) {
+                return paymentDb.getProductPaymentIdHashesCount.call();
+            })
+            .then(function (count3) {
+                assert.equal(count3.valueOf(), 1, "should have added idHash1");
+                return paymentDb.productPaymentIdHashes(0);
+            })
+            .then(function (productPaymentIdHash4) {
+                assert.equal(web3.toHex(productPaymentIdHash4), idHash1, "should have been same hash");
+                return paymentDb.productPayments(idHash1);
+            })
+            .then(function (productPaymentStruct5) {
+                assert.equal(web3.toHex(productPaymentStruct5[0]), idHash1, "should get same hash");
+                assert.equal(productPaymentStruct5[1], productPayment1, "should get same address");
+                assert.equal(productPaymentStruct5[2], 0, "should be in first index");
+                assert.isTrue(productPaymentStruct5[3], "should be flagged as there");
+            })
+            .then(done)
+            .catch(done);
+
+    });
+
+    it("should not be possible to add the same productPayment again", function (done) {
+
+    new Promise(function (resolve, reject) {
+            try {
+                resolve(paymentDb.addProductPayment.call(
+                    idHash1,
+                    productPayment1,
+                    { from: anotherAdder, gas: 300000 }));
+            } catch(e) {
+                reject(e);
+            }
+        })
+        .then(function (success0) {
+            done("should have thrown");
+        })
+        .catch(function (e) {
+            if ((e + "").indexOf("invalid JUMP") > -1) {
+                // We are in TestRPC
+                done();
+            } else {
+                done(e);
+            }
+        });
+
+    });
+
+    it("should be possible to add another productPayment", function (done) {
+
+        paymentDb.addProductPayment.call(idHash2, productPayment2, { from: anotherAdder })
+            .then(function (success0) {
+                assert.isTrue(success0, "adding idHash2 should be possible");
+                return paymentDb.addProductPayment(idHash2, productPayment2, { from: anotherAdder });
+            })
+            .then(function (txn1) {
+                return web3.eth.getTransactionReceiptMined(txn1);
+            })
+            .then(function (receipt2) {
+                return paymentDb.getProductPaymentIdHashesCount.call();
+            })
+            .then(function (count3) {
+                assert.equal(count3.valueOf(), 2, "should have added idHash2");
+                return paymentDb.productPaymentIdHashes(1);
+            })
+            .then(function (productPaymentIdHash4) {
+                assert.equal(web3.toHex(productPaymentIdHash4), idHash2, "should have been same hash");
+                return paymentDb.productPayments(idHash2);
+            })
+            .then(function (productPaymentStruct5) {
+                assert.equal(web3.toHex(productPaymentStruct5[0]), idHash2, "should get same hash");
+                assert.equal(productPaymentStruct5[1], productPayment2, "should get same address");
+                assert.equal(productPaymentStruct5[2], 1, "should be in second index");
+                assert.isTrue(productPaymentStruct5[3], "should be flagged as there");
             })
             .then(done)
             .catch(done);
