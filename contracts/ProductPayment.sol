@@ -8,19 +8,29 @@ import "Owned.sol";
 contract ProductPayment is Owned {
 	uint public price;
 	address public beneficiary;
+	uint public timeOut;
 	bool public isPaid;
 	mapping (address => uint) public contributions;
 	address[] public contributors;
 
 	event OnRemaining(uint indexed leftToPay);
 
-	function ProductPayment(uint _price, address _beneficiary) noValue {
+	function ProductPayment(uint _price, address _beneficiary, uint _durationSeconds) 
+		noValue {
 		price = _price;
 		beneficiary = _beneficiary;
+		timeOut = now + _durationSeconds;
 	}
 
 	modifier isNotPaidYet {
 		if (isPaid) {
+			throw;
+		}
+		_
+	}
+
+	modifier isNotTimedOut {
+		if (timeOut < now) {
 			throw;
 		}
 		_
@@ -54,7 +64,7 @@ contract ProductPayment is Owned {
 	}
 
 	function ()
-		isNotPaidYet {
+		isNotTimedOut isNotPaidYet {
 		if (msg.value == 0) {
 			throw;
 		}

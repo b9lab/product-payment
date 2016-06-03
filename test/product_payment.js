@@ -20,6 +20,16 @@ web3.eth.getTransactionReceiptMined = function (txnHash) {
     });
 };
 
+function delay(seconds) {
+    return new Promise (function (resolve, reject) {
+        try {
+            setTimeout(resolve, seconds);
+        } catch (e) {
+            reject(e);
+        }
+    });
+}
+
 contract('ProductPayment, regular operations,', function(accounts) {
 
   var owner = accounts[0];
@@ -34,6 +44,7 @@ contract('ProductPayment, regular operations,', function(accounts) {
                 ProductPayment.new(
                     web3.toWei(100, "finney"),
                     owner,
+                    86400,
                     { from: owner, value: 100 })
                     .catch(function (e) {
                         resolve();
@@ -58,6 +69,7 @@ contract('ProductPayment, regular operations,', function(accounts) {
     ProductPayment.new(
         web3.toWei(100, "finney"),
         owner,
+        86400,
         { from: owner })
       .then(function (newProductPayment) {
         productPayment = newProductPayment;
@@ -80,6 +92,12 @@ contract('ProductPayment, regular operations,', function(accounts) {
         })
         .then(function (beneficiaryAddress2) {
             assert.equal(beneficiaryAddress2, owner, "beneficiary not as built");
+            return productPayment.timeOut();
+        })
+        .then(function (timeOut3) {
+            var roughTimeOut = 86400 + new Date().getTime() / 1000;
+            assert.isAtLeast(timeOut3.valueOf(), roughTimeOut - 60, "timeOut is too far in the past");
+            assert.isAtMost(timeOut3.valueOf(), roughTimeOut, "timeOut is too far in the future");
             return productPayment.isPaid();
         })
         .then(function (isPaid3) {
@@ -360,6 +378,7 @@ contract('ProductPayment, regular operations,', function(accounts) {
     ProductPayment.new(
         web3.toWei(100, "finney"),
         beneficiary,
+        86400,
         { from: owner })
       .then(function (newProductPayment) {
         productPayment = newProductPayment;
@@ -408,6 +427,7 @@ contract('ProductPayment, regular operations,', function(accounts) {
     ProductPayment.new(
         web3.toWei(100, "finney"),
         beneficiary,
+        86400,
         { from: owner })
       .then(function (newProductPayment) {
         productPayment = newProductPayment;
@@ -513,6 +533,7 @@ contract('ProductPayment, regular operations,', function(accounts) {
     ProductPayment.new(
         web3.toWei(100, "finney"),
         beneficiary,
+        86400,
         { from: owner })
       .then(function (newProductPayment) {
         productPayment = newProductPayment;
@@ -570,6 +591,7 @@ contract('ProductPayment, regular operations,', function(accounts) {
     ProductPayment.new(
         web3.toWei(100, "finney"),
         beneficiary,
+        86400,
         { from: owner })
       .then(function (newProductPayment) {
         productPayment = newProductPayment;
@@ -636,6 +658,7 @@ contract('ProductPayment, regular operations,', function(accounts) {
     ProductPayment.new(
         web3.toWei(100, "finney"),
         beneficiary,
+        86400,
         { from: owner })
       .then(function (newProductPayment) {
         productPayment = newProductPayment;
@@ -691,6 +714,7 @@ contract('ProductPayment, regular operations,', function(accounts) {
     ProductPayment.new(
         web3.toWei(100, "finney"),
         beneficiary,
+        86400,
         { from: owner })
       .then(function (newProductPayment) {
         productPayment = newProductPayment;
@@ -765,6 +789,55 @@ contract('ProductPayment, regular operations,', function(accounts) {
         })
         .then(done)
         .catch(done);
+
+  });
+
+  it("should deploy a new productPayment that times out immediately", function (done) {
+
+    ProductPayment.new(
+            web3.toWei(100, "finney"),
+            beneficiary,
+            0,
+            { from: owner })
+        .then(function (newProductPayment) {
+            productPayment = newProductPayment;
+            // Making sure we time out
+            return delay(1);
+        })
+        .then(done)
+        .catch(done);
+
+  });
+
+  it("should not accept payment if timed out", function (done) {
+
+    new Promise(function (resolve, reject) {
+            try {
+                resolve(web3.eth.sendTransaction({
+                        from: owner, 
+                        to: productPayment.address,
+                        value: web3.toWei(100, "finney"),
+                        gas: 3000000
+                    }));
+            } catch (e) {
+                reject(e);
+            }
+        })
+        .then(function (txn0) {
+            return web3.eth.getTransactionReceiptMined(txn0);
+        })
+        .then(function (receipt1) {
+            assert.equal(receipt1.gasUsed, 3000000, "There should have been an exception in sending the transaction");
+        })
+        .then(done)
+        .catch(function(e) {
+            if ((e + "").indexOf("invalid JUMP") > -1) {
+                // We are in TestRPC
+                done();
+            } else {
+                done(e);
+            }
+        });
 
   });
 

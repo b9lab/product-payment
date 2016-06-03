@@ -12,3 +12,4 @@ Offers the possibility for a customer to pay for a product with Ether.
  * the exact price is transferred to the main instance of `PaymentDb`.
  * the remainder, if above 0, is returned to the sender of the last transfer.
  * the contract becomes frozen, not killed, and remains there. It can no longer be funded.
+* When the timeout has expired, it is possible to be refunded, but not to keep paying.
