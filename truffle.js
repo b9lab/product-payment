@@ -4,9 +4,6 @@ module.exports = {
     "app.js": [
       "javascripts/app.js"
     ],
-    "app.css": [
-      "stylesheets/app.css"
-    ],
     "images/": "images/"
   },
   deploy: [

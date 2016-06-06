@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Course Payment</title>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+  <script src="./app.js"></script>
+  <script src="./values.js"></script>
+</head>
+<body>
+  <h1>Course Payment</h1>
+  <h2>Example B(Lab) Dapp</h2>
+
+  <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#purchaseCourse1">
+    Purchase Course with Ether
+  </button>
+
+  <div class="modal fade" id="purchaseCourse1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">Purchase Course with Ether</h4>
+        </div>
+        <div class="modal-body">
+          <div>
+            Price: <span id="priceInEther">Loading...</span> Ether
+          </div>
+          <div>
+            Your payment hash: <span id="paymentHash">Loading...</span>
+          </div>
+          <div>
+            MasterPay at <span id="deployedMasterPay">Loading...</span>
+          </div>
+          <div>
+            Payment Create Transaction: <span id="createTransaction">Loading...</span>
+          </div>
+          <div>
+            Payment Address: <span id="paymentAddress">Loading...</span>
+          </div>
+          <div>
+            Remaining to Pay: <span id="remainingToPay">Loading...</span> Ether.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

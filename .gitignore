@@ -1,0 +1,5 @@
+environments/development/bottle.py
+environments/development/bottle.pyc
+environments/development/build/*
+environments/development/contracts/*
+environments/test/contracts/*
