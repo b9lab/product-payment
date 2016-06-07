@@ -8,7 +8,9 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
   <script src="./app.js"></script>
-  <script src="./values.js"></script>
+  <script type="text/javascript">
+    var productId = "B2016-01";
+  </script>
 </head>
 <body>
   <h1>Course Payment</h1>
@@ -27,22 +29,24 @@
         </div>
         <div class="modal-body">
           <div>
-            Price: <span id="priceInEther">Loading...</span> Ether
+            Price: <span id="priceInEther">Loading...</span> Ether, 
+            (<span id="priceInWei">Loading...</span> Wei)
           </div>
           <div>
-            Your payment hash: <span id="paymentHash">Loading...</span>
+            Is paid: <span id="isPaid">Loading...</span>
           </div>
           <div>
-            MasterPay at <span id="deployedMasterPay">Loading...</span>
-          </div>
-          <div>
-            Payment Create Transaction: <span id="createTransaction">Loading...</span>
+            Remaining to Pay: <span id="remainingToPayEther">Loading...</span> Ether,
+            (<span id="remainingToPayWei">Loading...</span> Wei)
           </div>
           <div>
             Payment Address: <span id="paymentAddress">Loading...</span>
           </div>
           <div>
-            Remaining to Pay: <span id="remainingToPay">Loading...</span> Ether.
+            Your payment hash: <span id="paymentHash">Loading...</span>
+          </div>
+          <div>
+            MasterPay at: <span id="deployedMasterPay">Loading...</span>
           </div>
         </div>
         <div class="modal-footer">
