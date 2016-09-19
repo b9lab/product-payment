@@ -58,8 +58,11 @@ contract ProductPayment is Owned {
 
 	function refundMe()
 		isNotPaidYet noValue {
-		if (msg.sender.send(contributions[msg.sender])) {
-			contributions[msg.sender] = 0;
+		uint refund = contributions[msg.sender];
+		// We set to 0 before sending to prevent a recursive call attack.
+		contributions[msg.sender] = 0;
+		if (!msg.sender.call.value(refund)()) {
+			contributions[msg.sender] = refund;
 		}
 	}
 
